@@ -1,11 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 import uvicorn
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 
-@app.get("/")
-def root():
+@app.get("/", response_class=HTMLResponse)
+async def landing(request: Request):
+    return templates.TemplateResponse(request, "index.html")
+
+
+@app.get("/api")
+def api_status():
     return {"estado": "Zero Config Web activado", "magia": True}
 
 

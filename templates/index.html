@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zero Config Web</title>
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f1a;
+      color: #e0e0f0;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 60px;
+      background: rgba(15, 15, 26, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(120, 80, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #a78bfa;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-logo span { color: #e0e0f0; }
+
+    /* Hamburguesa */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 26px;
+      height: 18px;
+      cursor: pointer;
+      z-index: 101;
+    }
+
+    .hamburger span {
+      display: block;
+      height: 2px;
+      background: #a78bfa;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    /* Animación al abrir */
+    .hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+    /* Menú desplegable */
+    .nav-menu {
+      position: fixed;
+      top: 60px;
+      right: -260px;
+      width: 240px;
+      background: #1a1a2e;
+      border-left: 1px solid rgba(120, 80, 255, 0.2);
+      border-bottom: 1px solid rgba(120, 80, 255, 0.2);
+      border-radius: 0 0 0 12px;
+      padding: 1.5rem 0;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 99;
+    }
+
+    .nav-menu.open { right: 0; }
+
+    .nav-menu a {
+      display: block;
+      padding: 0.75rem 2rem;
+      color: #c4b5fd;
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 0.03em;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-menu a:hover {
+      background: rgba(167, 139, 250, 0.12);
+      color: #fff;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 2rem 2rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(167, 139, 250, 0.15);
+      border: 1px solid rgba(167, 139, 250, 0.4);
+      color: #a78bfa;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 480px;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    /* ── Card de la API ── */
+    .api-card {
+      background: #1a1a2e;
+      border: 1px solid rgba(167, 139, 250, 0.2);
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      min-width: 300px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .api-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(167,139,250,0.15) 0%, transparent 70%);
+    }
+
+    .api-card h2 {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 1.25rem;
+    }
+
+    .api-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .api-row:last-child { margin-bottom: 0; }
+
+    .api-key {
+      font-size: 0.85rem;
+      color: #7c3aed;
+      font-family: monospace;
+      min-width: 70px;
+    }
+
+    .api-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e0e0f0;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+      flex-shrink: 0;
+    }
+
+    .dot.loading { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+    .dot.error   { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.78rem;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-logo">Zero<span>Config</span></div>
+    <div class="hamburger" id="hamburger" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </nav>
+
+  <!-- Menú colapsado -->
+  <div class="nav-menu" id="navMenu">
+    <a href="#">🏠 Inicio</a>
+    <a href="#">📡 API Docs</a>
+    <a href="#">⚙️ Config</a>
+    <a href="#">📬 Contacto</a>
+  </div>
+
+  <!-- Hero -->
+  <main class="hero">
+    <span class="badge">✦ API en vivo</span>
+    <h1>Zero Config Web<br>activado</h1>
+    <p class="subtitle">
+      Estado en tiempo real desde el endpoint <code style="color:#a78bfa">/api</code>.
+      Sin configuración. Sin fricción.
+    </p>
+
+    <div class="api-card">
+      <h2>Respuesta del servidor</h2>
+      <div class="api-row">
+        <div class="dot loading" id="dot"></div>
+        <span class="api-key">estado</span>
+        <span class="api-value" id="val-estado">Cargando…</span>
+      </div>
+      <div class="api-row">
+        <span style="width:10px;flex-shrink:0"></span>
+        <span class="api-key">magia</span>
+        <span class="api-value" id="val-magia">—</span>
+      </div>
+    </div>
+  </main>
+
+  <footer>Zero Config Web · FastAPI + uvicorn · puerto 8085</footer>
+
+  <script>
+    // ── Hamburger toggle ──
+    const hamburger = document.getElementById('hamburger');
+    const navMenu   = document.getElementById('navMenu');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navMenu.classList.toggle('open');
+    });
+
+    // Cerrar al clickear fuera
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+        hamburger.classList.remove('open');
+        navMenu.classList.remove('open');
+      }
+    });
+
+    // ── Fetch a la API ──
+    async function loadApiData() {
+      const dot      = document.getElementById('dot');
+      const valEstado = document.getElementById('val-estado');
+      const valMagia  = document.getElementById('val-magia');
+      try {
+        const res  = await fetch('/api');
+        const data = await res.json();
+        valEstado.textContent = data.estado  ?? '—';
+        valMagia.textContent  = data.magia   ? '✅ verdadera' : '❌ falsa';
+        dot.classList.remove('loading');
+      } catch (err) {
+        valEstado.textContent = 'Error al conectar';
+        dot.classList.remove('loading');
+        dot.classList.add('error');
+      }
+    }
+
+    loadApiData();
+  </script>
+</body>
+</html>
