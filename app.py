@@ -14,7 +14,7 @@ async def landing(request: Request):
 
 @app.get("/api")
 def api_status():
-    return {"estado": "Zero Config Web activado!!", "magia": True}
+    return {"estado": "Zero Config Web activado adsd!!", "magia": True}
 
 
 if __name__ == "__main__":
